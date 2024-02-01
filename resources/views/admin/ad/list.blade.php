@@ -56,11 +56,12 @@
                       <thead>
                         <tr>
                           <th>S.No.</th>
+						  <th>Image</th>
                           <th>Title</th>
                           <th>Description</th>
                           <th>Category</th>
                           <?php /*?><th>Image</th><?php */?>
-                          <th>Actions</th>
+                          <th style="width: 200px !important">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -69,6 +70,11 @@
                       @foreach($ads as $ad)
                       <tr>
                         <td>{{$loop->iteration}}</td>
+						<td class="product-img">
+							<?php $images = explode("," ,$ad->ad_images)?>
+							<img
+							src="{{  asset('uploads/ad/thumb/'.$images[0] ) ?? $noImage}} "
+							width="50"/></td>
                         <td>{{$ad->ad_title}}</td>
                         <td>{{Str::limit($ad->ad_description, 20, ' (...)')}}</td>
                         <td>{{$ad->category_name}} --> {{$ad->sub_category_name}}</td>
@@ -113,6 +119,9 @@
 	$('.zero-configuration').DataTable(
 		{
 			"displayLength": 50,
+			 "columnDefs": [
+				{ width: '200px', targets: 5 }  //step 2, column 3 out of 4
+			]
 		}
 	);
 

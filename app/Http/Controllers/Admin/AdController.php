@@ -312,13 +312,13 @@ class AdController extends Controller
 			->whereNull('ads.deleted_at')
             ->get();*/
 		
-		$ads = Ad::join('categories as cat', 'ads.ad_category_id', '=', 'cat.id')
-			->join('categories as sub_cat', 'ads.ad_sub_category_id', '=', 'sub_cat.id')
-            ->select('ads.*', 'cat.name_en as category_name', 'sub_cat.name_en as sub_category_name' )
+
+			$ads = Ad::select('ads.*', 'cat.name_en as category_name', 'sub_cat.name_en as sub_category_name',DB::raw(' (select GROUP_CONCAT(ads_image) from sls_ads_images WHERE ads_ad_id = sls_ads.id and `status` =1 ) as ad_images'))->leftJoin('categories as cat', 'ads.ad_category_id', '=', 'cat.id')
+			->leftJoin('categories as sub_cat', 'ads.ad_sub_category_id', '=', 'sub_cat.id')
 			->whereNull('ads.deleted_at')
 			->orderByDesc('ads.id')
             ->get();
-		
+
 		//print_r($ads);
 		
 		$noImage = asset(Config::get('constants.NO_IMG_ADMIN'));

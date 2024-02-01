@@ -21,6 +21,7 @@ use App\Models\Favourite;
 use App\Models\Post;
 use App\Models\Visitor;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 // For Date Format
 
@@ -169,12 +170,20 @@ class AdController extends Controller
                 }
 
                 $ad_price = explode('.', $allad->ad_price);
+                $image = asset(Ad::$noImageUrl);
                 $adfeatureimage = DB::table('ads_images')->where(['ads_ad_id' => $allad->id, 'is_feature' => '1', 'deleted_at' => null,])->first();
-                if ($adfeatureimage) {
-                    $adimage = $adfeatureimage;
+                if ($adfeatureimage && File::exists(public_path(Ad::$imageThumbUrl.$adfeatureimage->ads_image))) {
+                    //$adimage = $adfeatureimage;
+                    $image = asset(Ad::$imageThumbUrl . $adfeatureimage->ads_image);
                 } else {
-                    $adfeatureimage = DB::table('ads_images')->where(['ads_ad_id' => $allad->id, 'deleted_at' => null,])->first();
-                    $adimage = $adfeatureimage;
+                    $adImages = DB::table('ads_images')->where(['ads_ad_id' => $allad->id, 'deleted_at' => null,])->get();
+                    foreach($adImages as $indiviualimage){
+                        if(File::exists(public_path(Ad::$imageThumbUrl.$indiviualimage->ads_image))){
+                            $image = asset(Ad::$imageThumbUrl . $indiviualimage->ads_image);
+                            break;
+                        }
+                    }
+                    //$adimage = $adfeatureimage;
                 }
 
                 $ad[] = [
@@ -186,7 +195,8 @@ class AdController extends Controller
                     'ad_condition' => ucfirst($allad->ad_condition),
                     'ad_location' => $allad->$location,
                     'ad_is_featured' => $allad->ad_is_featured,
-                    "ad_image" => !empty($adimage->ads_image) ? asset(Ad::$imageThumbUrl . $adimage->ads_image) : asset(Ad::$noImageUrl),
+                    //"ad_image" => !empty($adimage->ads_image) ? asset(Ad::$imageThumbUrl . $adimage->ads_image) : asset(Ad::$noImageUrl),
+                    "ad_image" => $image,
                     'ad_cat_name' => $allad->$cat_name,
                     "favourite" => $fav_val,
                 ];
@@ -312,24 +322,29 @@ class AdController extends Controller
                 ->get();
             $gallery = array();
             foreach ($adsimages as $media) {
-                $gallery[] = $media->ads_image;
+                $imageMainUrl = Ad::$imageUrl;
+                if(file_exists($imageMainUrl . $media->ads_image)){
+                    $gallery[] = $media->ads_image;
 
-                // Check the Medium and thumb is there
-                $mediumPath = Ad::$imageMediumPath;
-                if (!file_exists($mediumPath . $media->ads_image)) {
-                    // Make the Medium Image
-                    try {
-                        $processImage = Image::make(Ad::$imagePath . $media->ads_image);
-                    } catch (NotReadableException $e) {
-                        // If error, stop and continue looping to next iteration
-                        continue;
+                    // Check the Medium and thumb is there
+                    $mediumPath = Ad::$imageMediumPath;
+                    if (!file_exists($mediumPath . $media->ads_image)) {
+                        // Make the Medium Image
+                        try {
+                            $processImage = Image::make(Ad::$imagePath . $media->ads_image);
+                        } catch (NotReadableException $e) {
+                            // If error, stop and continue looping to next iteration
+                            continue;
+                        }
+                        // resize the image to a width of 500 and constrain aspect ratio (auto height)
+                        $processImage->resize(500, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                        $processImage->save($mediumPath . $media->ads_image);
                     }
-                    // resize the image to a width of 500 and constrain aspect ratio (auto height)
-                    $processImage->resize(500, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-                    $processImage->save($mediumPath . $media->ads_image);
+
                 }
+                
             }
 
             // Related Ads
@@ -346,12 +361,27 @@ class AdController extends Controller
             if ($relatedAds) {
                 foreach ($relatedAds as $relatedAd) {
                     $ad_price = explode('.', $relatedAd->ad_price);
-                    $adfeatureimage = DB::table('ads_images')->where(['ads_ad_id' => $relatedAd->id, 'is_feature' => '1', 'deleted_at' => null,])->first();
-                    if ($adfeatureimage) {
-                        $adimage = $adfeatureimage;
+                    // $adfeatureimage = DB::table('ads_images')->where(['ads_ad_id' => $relatedAd->id, 'is_feature' => '1', 'deleted_at' => null,])->first();
+                    // if ($adfeatureimage) {
+                    //     $adimage = $adfeatureimage;
+                    // } else {
+                    //     $adfeatureimage = DB::table('ads_images')->where(['ads_ad_id' => $relatedAd->id, 'deleted_at' => null,])->first();
+                    //     $adimage = $adfeatureimage;
+                    // }
+                    $image = asset(Ad::$noImageUrl);
+                    $adfeatureimage = DB::table('ads_images')->where(['ads_ad_id' => $relatedAd->id, 'is_feature' => '1', 'deleted_at' => null])->first();
+                    if ($adfeatureimage && File::exists(public_path(Ad::$imageThumbUrl.$adfeatureimage->ads_image))) {
+                        //$adimage = $adfeatureimage;
+                        $image = asset(Ad::$imageThumbUrl . $adfeatureimage->ads_image);
                     } else {
-                        $adfeatureimage = DB::table('ads_images')->where(['ads_ad_id' => $relatedAd->id, 'deleted_at' => null,])->first();
-                        $adimage = $adfeatureimage;
+                        $adImages = DB::table('ads_images')->where(['ads_ad_id' => $relatedAd->id, 'deleted_at' => null,])->get();
+                        foreach($adImages as $indiviualimage){
+                            if(File::exists(public_path(Ad::$imageThumbUrl.$indiviualimage->ads_image))){
+                                $image = asset(Ad::$imageThumbUrl . $indiviualimage->ads_image);
+                                break;
+                            }
+                        }
+                        //$adimage = $adfeatureimage;
                     }
                     $related[] = [
                         'detail_url' => route('viewad', [app()->getLocale(), $relatedAd->slug]),
@@ -363,7 +393,8 @@ class AdController extends Controller
                         'ad_is_featured' => $relatedAd->ad_is_featured,
                         'ad_username' => $relatedAd->username,
                         'ad_usermobile' => $relatedAd->usermobile,
-                        "ad_image" => !empty($adimage->ads_image) ? asset(Ad::$imageThumbUrl . $adimage->ads_image) : asset(Ad::$noImageUrl),
+                        //"ad_image" => !empty($adimage->ads_image) ? asset(Ad::$imageThumbUrl . $adimage->ads_image) : asset(Ad::$noImageUrl),
+                        'ad_image' => $image,
                     ];
                 }
             }

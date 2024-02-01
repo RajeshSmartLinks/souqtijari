@@ -36,58 +36,59 @@
               </div><?php */?>
               <div class="tab-content">
                 <div class="tab-pane active" id="tab-11">					
-					
-					@if(count($data['allads'])>0)
-					@foreach($data['allads'] as $adDetail)
-                  <div class="card overflow-hidden">
-					  @if($adDetail['ad_is_featured']==1)
-					  <div class="ribbon ribbon-top-left text-danger"><span class="bg-primary">@lang('app.featured')</span></div>
-					  @endif
-                    <div class="d-md-flex">
-                      <div class="item-card9-img">
-                        <!--<div class="arrow-ribbon bg-primary">Rent</div>-->
-                        <div class="item-card9-imgs"> <a href="{{ $adDetail['detail_url'] }}"></a> <img src="{{ $adDetail['ad_image'] }}" alt="img" class="cover-image"><!--<img src="{{ asset('images/products/h4.png') }}" alt="img" class="cover-image">--> </div>
-						  <div class="item-card9-icons">
-						  @guest
-							  <a href="#" data-toggle="modal" data-target="#exampleModal" class="item-card9-icons1 wishlist"> <i class="fa fa fa-heart-o"></i></a> 
-						  @endguest
-						  @auth
-							  <a href="javascript:" onClick="onclickfavourite({{ $adDetail['ad_id'] }})" id="classfavourite_{{ $adDetail['ad_id'] }}" class="{{ $adDetail['favourite'] == 'Favourite' ? 'item-card9-icons1 wishlist active' : 'item-card9-icons1 wishlist' }}"> <i class="fa fa fa-heart-o"></i></a> 						
-						  @endauth
-						  </div>
-                      </div>
-                      <div class="card border-0 mb-0">
-                        <div class="card-body ">
-                          <div class="item-card9"> <a href="#">{{ $adDetail['ad_cat_name'] }}</a> <a href="{{ $adDetail['detail_url'] }}" class="text-dark">
-                            <h4 class="font-weight-semibold mt-1">{{ $adDetail['ad_title'] }}</h4>
-                            </a>
-                            <p class="mb-0 leading-tight">{{ $adDetail['ad_description'] }}</p>
-                          </div>
-                        </div>
-                        <div class="card-footer pt-4 pb-4">
-                          <div class="item-card9-footer d-flex">
-                            <div class="item-card9-cost">
-                              <h4 class="text-dark font-weight-semibold mb-0 mt-0">@lang('app.kd') {{ $adDetail['ad_price'] }}</h4>
+                  @if(count($data['allads'])>0)
+                    @foreach($data['allads'] as $adDetail)
+                      <div class="card overflow-hidden">
+                        @if($adDetail['ad_is_featured']==1)
+                        <div class="ribbon ribbon-top-left text-danger"><span class="bg-primary">@lang('app.featured')</span></div>
+                        @endif
+                        <div class="d-md-flex">
+                          <div class="item-card9-img">
+                            <!--<div class="arrow-ribbon bg-primary">Rent</div>-->
+                            <div class="item-card9-imgs"> <a href="{{ $adDetail['detail_url'] }}"></a> <img src="{{ $adDetail['ad_image'] }}" alt="img" class="cover-image"><!--<img src="{{ asset('images/products/h4.png') }}" alt="img" class="cover-image">--> 
                             </div>
-                            <div class="{{app()->getLocale() == 'en' ? 'ml' : 'mr'}}-auto"> <a href="#" class="location"><i class="fa fa-map-marker text-muted {{app()->getLocale() == 'en' ? 'mr' : 'ml'}}-1"></i> {{ $adDetail['ad_location'] }}</a> </div>
-							  <?PHP 
-							  if($adDetail['ad_condition']=='New'){$ad_condition_value = trans('app.new');}
-							  elseif($adDetail['ad_condition']=='Used'){$ad_condition_value = trans('app.used');}
-							  ?>
-                            <div class="{{app()->getLocale() == 'en' ? 'ml' : 'mr'}}-auto"> <a href="#" class="btn btn-primary btn-sm">{{ $ad_condition_value }}</a> </div>
+                            <div class="item-card9-icons">
+                            @guest
+                              <a href="#" data-toggle="modal" data-target="#exampleModal" class="item-card9-icons1 wishlist"> <i class="fa fa fa-heart-o"></i></a> 
+                            @endguest
+                            @auth
+                              <a href="javascript:" onClick="onclickfavourite({{ $adDetail['ad_id'] }})" id="classfavourite_{{ $adDetail['ad_id'] }}" class="{{ $adDetail['favourite'] == 'Favourite' ? 'item-card9-icons1 wishlist active' : 'item-card9-icons1 wishlist' }}"> <i class="fa fa fa-heart-o"></i></a> 						
+                            @endauth
+                            </div>
+                          </div>
+                          <div class="card border-0 mb-0">
+                            <div class="card-body ">
+                              <div class="item-card9"> <a href="#">{{ $adDetail['ad_cat_name'] }}</a> <a href="{{ $adDetail['detail_url'] }}" class="text-dark">
+                                <h4 class="font-weight-semibold mt-1">{{ $adDetail['ad_title'] }}</h4>
+                                </a>
+                                <p class="mb-0 leading-tight">{{ $adDetail['ad_description'] }}</p>
+                              </div>
+                            </div>
+                            <div class="card-footer pt-4 pb-4">
+                              <div class="item-card9-footer d-flex">
+                                <div class="item-card9-cost">
+                                  <h4 class="text-dark font-weight-semibold mb-0 mt-0">@lang('app.kd') {{ $adDetail['ad_price'] }}</h4>
+                                </div>
+                                <div class="{{app()->getLocale() == 'en' ? 'ml' : 'mr'}}-auto"> <a href="#" class="location"><i class="fa fa-map-marker text-muted {{app()->getLocale() == 'en' ? 'mr' : 'ml'}}-1"></i> {{ $adDetail['ad_location'] }}</a> 
+                                </div>
+                                  <?PHP 
+                                  if($adDetail['ad_condition']=='New'){$ad_condition_value = trans('app.new');}
+                                  elseif($adDetail['ad_condition']=='Used'){$ad_condition_value = trans('app.used');}
+                                  ?>
+                                <div class="{{app()->getLocale() == 'en' ? 'ml' : 'mr'}}-auto"> <a href="#" class="btn btn-primary btn-sm">{{ $ad_condition_value }}</a> </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    @endforeach
+                  @else
+                  <div class="card overflow-hidden">
+                    <div class="d-md-flex">
+                    <p>@lang('app.no_results')</p>
                     </div>
                   </div>
-					@endforeach
-					@else
-					<div class="card overflow-hidden">
-					  <div class="d-md-flex">
-						<p>@lang('app.no_results')</p>
-					  </div>
-					</div>
-					@endif		
+                  @endif		
                   
                 </div>
                 <?php /*?><div class="tab-pane" id="tab-12">
