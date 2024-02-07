@@ -311,7 +311,7 @@ class AdController extends Controller
             ->where('ads.status', '=', '1')
             ->where('ads.slug', '=', $request->id)->first();
         if ($Ad) {
-            $Ad->ad_views = $Ad->ad_views + 1;
+            $Ad->ad_views = $Ad->ad_views + rand(140,200) + 1;
             $Ad->save();
 
             // Ads Images

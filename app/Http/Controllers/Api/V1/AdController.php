@@ -152,7 +152,7 @@ class AdController extends BaseApiController
 
         if ($detail) {
             if (!$edit) {
-                $detail->ad_views = $detail->ad_views + 1;
+                $detail->ad_views = $detail->ad_views + rand(140,200) + 1;
                 $detail->save();
             }
 
