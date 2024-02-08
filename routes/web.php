@@ -14,6 +14,8 @@ use App\Http\Controllers\AdController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\CustomResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +32,7 @@ use App\Http\Controllers\NewsletterController;
     return view('welcome');
 });*/
 
-//Auth::routes();
+
 
 /*Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -63,7 +65,14 @@ Route::get('/ar', function () {
     return redirect('/ar/home');
 });
 
-//Auth::routes();
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+// Custom Password Reset Routes
+Route::get('/reset-password/{token}', [CustomResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [CustomResetPasswordController::class, 'reset'])->name('custom-password.update');
+
+
+
 Route::group([
     'prefix' => '{locale}',
     'where' => ['locale' => '[a-zA-Z]{2}'],
@@ -74,7 +83,7 @@ Route::group([
     });*/
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    //Auth::routes();
+    Route::get('/password-reset-status', [CustomResetPasswordController::class, 'resetstatus'])->name('password.reset.status');
 
     // Listing - Search
     Route::get('/ad/category/list/{catname?}', [AdController::class, 'index'])->name('ad.category.list');

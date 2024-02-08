@@ -47,6 +47,14 @@ class UserController extends Controller
         // Visitors Count - End
 
         $myPrev = session()->get('_previous')['url'];
+        $urlBreakUp = explode("/",$myPrev);
+        foreach($urlBreakUp as $segments){
+            if($segments == 'password-reset-status'){
+                $myPrev = route('user.dashboard',app()->getLocale());
+            }
+        }
+
+
         session()->put('mytake', $myPrev);
 
         $user = Auth::user();
@@ -161,6 +169,20 @@ class UserController extends Controller
         return redirect('/');
         //return redirect(app()->getLocale());
     }
+    /* mobile otp forgotpassword */
+    // public function viewforgot()
+    // {
+    //     $user = Auth::user();
+    //     if (empty($user)) {
+    //         $titles = [
+    //             "title" => trans("app.forgot"),
+    //         ];
+    //         return view('front.user.forgot_mobile', compact('titles'));
+    //     }
+    //     return redirect()->route('home', app()->getLocale());
+    // }
+
+
 
     public function viewforgot()
     {
