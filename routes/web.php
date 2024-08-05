@@ -112,6 +112,7 @@ Route::group([
         Route::get('/myads', [UserController::class, 'myads'])->name('user.ads');
         Route::get('/createad', [AdController::class, 'createad'])->name('createad');
         Route::get('/getsubcategory', [AdController::class, 'getsubcategory'])->name('getsubcategory');
+        Route::get('/getcountryAreas', [AdController::class, 'getcountryAreas'])->name('getcountryAreas');
         Route::get('/getbrandname', [AdController::class, 'getbrandname'])->name('getbrandname');
         Route::post('/adcreate', [AdController::class, 'adcreate'])->name('adcreate');
 
@@ -162,3 +163,6 @@ Route::get('/DumpUser', [\App\Http\Controllers\DataMigrationController::class, '
 
 Route::get('/UploadOldAds', [\App\Http\Controllers\DataMigrationController::class, 'uploadOldAds']);
 Route::get('/UploadOldUsers', [\App\Http\Controllers\DataMigrationController::class, 'uploadOldUsers']);
+Route::get('/dumpArears', [\App\Http\Controllers\DataMigrationController::class, 'dumpArears']);
+Route::get('/dumpoldNew', [\App\Http\Controllers\DataMigrationController::class, 'dumpoldTabletOneTable']);
+Route::get('/updateareas', [\App\Http\Controllers\DataMigrationController::class, 'updateareas']);

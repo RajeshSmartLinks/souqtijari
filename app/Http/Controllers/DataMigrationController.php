@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Ad;
+use App\Models\Area;
 use App\Models\User;
 use App\Models\Country;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Exception;
 
 class DataMigrationController extends Controller
 {
@@ -206,6 +207,111 @@ class DataMigrationController extends Controller
             # code...
         }
 
+    }
+
+    
+    public function dumpArears(){
+        ini_set('max_execution_time', 180);
+        $areas = DB::table('areas_aqari')->where(['is_migrated'=>0])->limit(6)->get();
+        dd($areas);
+        foreach($areas as $area){
+            $existingarea = Area::where(['slug' =>$area->slug])->first();
+            if(empty($existingarea)){
+                $newarea = new Area();
+                if($area->area_id != 0){
+                    //getting state details areas_aqari
+                    $stateDetails = DB::table('areas_aqari')->find($area->area_id);
+                    // checking in new area table
+                    $newstateDetails =  Area::where(['slug' =>$stateDetails->slug])->first();
+                    $newarea->area_id = $newstateDetails->id;
+                }else{
+                    $newarea->area_id = 0;
+                }
+                $newarea->slug = unique_slug($area->name_en , 'Area');
+                $newarea->name_en = $area->name_en;
+                $newarea->name_ar = $area->name_ar;
+                $newarea->image = $area->image;
+                $newarea->status = $area->status;
+                $newarea->country_id = $area->country_id;
+                $newarea->save();
+
+    
+                
+
+
+                DB::table('areas_aqari')
+                ->where('id', $area->id)  
+                ->update(array('is_migrated' => 1));
+
+            }
+            
+       
+        }
+    }
+
+    public function updateareas(){
+        $Ads = Ad::where(['is_migrated'=>0])->limit(800)->get();
+        foreach($Ads as $ad){
+      
+            if($ad->ad_location_area_cat == 1){
+                $ad_location_area_cat = 1708;
+            }elseif($ad->ad_location_area_cat == 2){
+                $ad_location_area_cat = 1706;
+            }elseif($ad->ad_location_area_cat == 3){
+                $ad_location_area_cat = 1709;
+            }elseif($ad->ad_location_area_cat == 4){
+                $ad_location_area_cat = 1707;
+            }elseif($ad->ad_location_area_cat == 5){
+                $ad_location_area_cat = 1710;
+            }elseif($ad->ad_location_area_cat == 6){
+                $ad_location_area_cat = 1711;
+            }
+            $oldArea = DB::table('areas_old')->find($ad->ad_location_area);
+            $newArea = DB::table('areas')->where(['area_id' => $ad_location_area_cat ,'name_en' => $oldArea->name_en])->first();
+            if(!empty($newArea)){
+                DB::table('ads')->where('id', $ad->id)->update(array('ad_location_area_cat' => $ad_location_area_cat,'ad_location_area' => $newArea->id,'is_migrated' => 1));
+            }
+        }
+    }
+
+    public function dumpoldTabletOneTable(){
+        $oldArea = DB::table('areas_old')->where(['is_migrated' => 0])->get();
+
+        foreach($oldArea as $area){
+        
+            $newarea = DB::table('areas')->where(['slug' => $area->slug])->get();
+            //dd(count($newarea));
+         
+            if(count($newarea) == 0){
+                //does not exist adding new record
+                $insertArea = new Area();
+                if($area->area_id == 1){
+                    $insertArea->area_id = 1708;
+                }elseif($area->area_id == 2){
+                    $insertArea->area_id = 1706;
+                }elseif($area->area_id == 3){
+                    $insertArea->area_id = 1709;
+                }elseif($area->area_id == 4){
+                    $insertArea->area_id = 1707;
+                }elseif($area->area_id == 5){
+                    $insertArea->area_id = 1710;
+                }elseif($area->area_id == 6){
+                    $insertArea->area_id = 1711;
+                }
+                $insertArea->slug =  unique_slug($area->name_en,'Area');
+                $insertArea->name_en = $area->name_en;
+                $insertArea->name_ar = $area->name_ar;
+                $insertArea->country_id = 117;
+                $insertArea->status = 1;
+                $insertArea->save();
+            }
+        
+
+            DB::table('areas_old')
+            ->where('id', $area->id)  
+            ->update(array('is_migrated' => 1));
+        }
+   
     }
    
 }

@@ -84,6 +84,21 @@
                       <div class="row">
                         <div class="col-12">
                           <div class="form-group row">
+                            <div class="col-md-3"> <span>Country</span> </div>
+                            <div class="col-md-9">
+                              <select name="ad_location_country" id="ad_location_country" class="form-control" required>
+                                <option value="">Select Country</option>
+                                @foreach($countries as $country)
+                                <option value="{{ $country->id }}">{{ $country->name_en }}</option>
+                                @endforeach
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <div class="form-group row">
                             <div class="col-md-3"> <span>Location</span> </div>
                             <div class="col-md-9">
                               <select name="ad_location_area" id="ad_location_area" class="form-control" required>

@@ -150,7 +150,7 @@ class HomeController extends BaseApiController
 
         // Location Ads
         $locations = Area::select('areas.id', 'areas.name_en as location_en', 'areas.name_ar as location_ar', 'areas.slug', 'areas.image')
-            ->where(['areas.area_id' => '0', 'areas.status' => '1'])
+            ->where(['areas.area_id' => '0', 'areas.status' => '1','country_id'=>117])
             ->groupby('areas.id')
             ->get();
 
@@ -268,15 +268,19 @@ class HomeController extends BaseApiController
         return $this->sendResponse(self::HTTP_ERR, ['message' => trans('app.failed')]);
     }
 
-    public function areas($stateId = '')
+    public function areas($stateId = '',$countryId = '')
     {
 
         $strLang = app()->getLocale();
 
+        if(!(isset($countryId) && !empty($countryId))){
+            $countryId = 117;
+        }
+
         if ($stateId) {
-            $areas = Area::whereAreaId($stateId)->get();
+            $areas = Area::whereAreaId($stateId)->where(['country_id' => $countryId])->get();
         } else {
-            $areas = Area::activeParent()->get();
+            $areas = Area::activeParent()->where(['country_id' => $countryId])->get();
         }
 
         $lists = array();

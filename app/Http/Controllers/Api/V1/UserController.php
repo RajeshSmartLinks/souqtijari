@@ -23,7 +23,7 @@ use League\Flysystem\File;
 
 class UserController extends BaseApiController
 {
-    use SendsPasswordResetEmails;
+    //use SendsPasswordResetEmails;
 
     // returns the First Name and Last Name
     public function seperateName($name)

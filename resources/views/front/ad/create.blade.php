@@ -50,19 +50,28 @@
               <label class="form-label text-dark">@lang('app.ad_description')</label>
               <textarea class="form-control" name="ad_description" id="ad_description" rows="6" placeholder="@lang('app.ad_description_here')" required></textarea>
             </div>
-			<div class="form-group">
+            <div class="form-group">
+              <label class="form-label text-dark">@lang('app.country')</label>
+              <select class="form-control custom-select" name="ad_location_country" id="ad_location_country" required>
+                <option value="">@lang('app.select_country')</option>
+                @foreach($data['countries'] as $country)
+                <option value="{{ $country->id }}">{{ $country->name_en }}</option>  
+                @endforeach
+              </select>
+            </div>
+			      <div class="form-group">
               <label class="form-label text-dark">@lang('app.location')</label>
               <select class="form-control custom-select" name="ad_location_area" id="ad_location_area" required>
                 <option value="">@lang('app.select_location')</option>
-				@foreach($data['areas'] as $area)
-					@if($area->child->count() > 0)                                    
-					<optgroup label="{{ $area->name_en }}">
-						@foreach($area->child as $location_area)                                        
-						<option value="{{ $location_area->id }}">{{ $location_area->name_en }}</option>   
-						@endforeach
-					</optgroup>
-					@endif
-				@endforeach
+                @foreach($data['areas'] as $area)
+                  @if($area->child->count() > 0)                                    
+                  <optgroup label="{{ $area->name_en }}">
+                    @foreach($area->child as $location_area)                                        
+                    <option value="{{ $location_area->id }}">{{ $location_area->name_en }}</option>   
+                    @endforeach
+                  </optgroup>
+                  @endif
+                @endforeach
               </select>
             </div>
             <div class="form-group">
@@ -367,6 +376,39 @@ $(document).ready(function(){
 			else{
 				$("#ad_brand_id").empty();
 				$("#ad_brand_id").append($("<option value=''>@lang('app.select_brand')</option>")); 
+			}
+		});
+	});
+
+  //country
+  $('#ad_location_country').on("change", function(){
+		var country_id = $(this).val();
+		$.ajax({
+			type: "GET",
+			url: '{{ route("getcountryAreas", app()->getLocale()) }}',
+			data: {'country_id': country_id}
+		}).done(function (result) {
+			if(result.length>0 || result == undefined || result == null){
+				var new_res = $.parseJSON(result);
+        console.log(new_res);
+				$('#ad_location_area').empty();
+				$("#ad_location_area").append($("<option value=''>@lang('app.select_location')</option>")); 
+				$.each(new_res, function(key, value) {
+          console.log(value);
+          $Html = `<optgroup label="`+value.name_en+`">`;
+            $.each(value.city, function(k,v){
+              $Html += `<option value="`+v.id+`">`+v.name_en+`</option>  `;
+            });
+            $Html +=`<optgroup>`;
+          $("#ad_location_area").append($Html); 
+
+          
+					
+				});					
+			}
+			else{
+				$("#ad_location_area").empty();
+				$("#ad_location_area").append($("<option value=''>@lang('app.select_area')</option>")); 
 			}
 		});
 	});

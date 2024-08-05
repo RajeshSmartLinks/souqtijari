@@ -2,26 +2,28 @@
 // DI CODE - Start
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+
 
 // Newly Added
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
-use Intervention\Image\Exception\NotReadableException;
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\CreateAd;
-use App\Models\Ad;
-use App\Models\Category;
-use App\Models\Brand;
-use App\Models\Area;
-use App\Models\User;
-use App\Models\Favourite;
-use App\Models\Post;
-use App\Models\Visitor;
 use Carbon\Carbon;
+use App\Models\Area;
+use App\Models\Ad;
+use App\Models\Post;
+use App\Models\User;
+use App\Models\Brand;
+use App\Mail\CreateAd;
+use App\Models\Country;
+use App\Models\Visitor;
+use App\Models\Category;
+use App\Models\Favourite;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route;
+use Intervention\Image\Facades\Image;
+use Intervention\Image\Exception\NotReadableException;
 
 // For Date Format
 
@@ -464,7 +466,8 @@ class AdController extends Controller
         $titles = ["title" => trans("app.adpost"),];
 
         $categories = Category::with('parent')->get();
-        $areas = Area::with('parent')->get();
+        //$areas = Area::with('parent')->where('country_id',117)->get();
+        $areas = [];
 
         $user = auth()->user();
         $userdetails = User::find($user->id);
@@ -492,6 +495,7 @@ class AdController extends Controller
         $title = 'title_' . $lang;
         $description = 'description_' . $lang;
         $safetytips = Post::whereSlug('safety-tips-for-buyers')->first();
+        $countries = Country::where('status',1)->get();
 
         $data = [
             'categories' => $categories,
@@ -505,6 +509,7 @@ class AdController extends Controller
             'safety_slug' => $safetytips->slug,
             'safety_title' => $safetytips->$title,
             'safety_description' => explode('|', strip_tags($safetytips->$description)),
+            'countries' => $countries
         ];
         return view('front.ad.create', compact('titles', 'data'));
     }
@@ -631,7 +636,14 @@ class AdController extends Controller
         $editAd = Ad::find($request->id);
         $categories = Category::with('parent')->get();
         $subcategories = Category::with('child')->where('category_id', '=', $editAd->ad_category_id)->get();
-        $areas = Area::with('parent')->get();
+        $editAd->country_id = 0;
+        $areas = [];
+        if(!empty($editAd->ad_location_area)){
+            $area = Area::find($editAd->ad_location_area);
+            $editAd->country_id = $area->country_id;
+            $areas = Area::with('parent')->where('country_id',$area->country_id)->get();
+        }
+        $countries = Country::where('status',1)->get();
         $brands = Brand::select('*')
             ->where('category_id', '=', $editAd->ad_sub_category_id)
             ->get();
@@ -669,6 +681,7 @@ class AdController extends Controller
             'safety_slug' => $safetytips->slug,
             'safety_title' => $safetytips->$title,
             'safety_description' => explode('|', strip_tags($safetytips->$description)),
+            'countries' => $countries
         ];
         return view('front.ad.edit', compact('titles', 'data', 'editAd'));
     }
@@ -768,6 +781,21 @@ class AdController extends Controller
                 $category_val[$categoryval->id] = $categoryval->name_en;
             }
             echo json_encode($category_val);
+        } else {
+            return false;
+        }
+    }
+
+    public function getcountryAreas(Request $request)
+    {
+        $country_id = $request->country_id;
+        $states = Area::where(['country_id' => $country_id , 'area_id' => 0 ,'status' => 1])->get();
+        if (count($states) > 0) {
+            foreach($states as $state){
+                $areas = Area::where('area_id' , $state->id)->get();
+                $state->city = $areas;
+            }
+            echo json_encode($states);
         } else {
             return false;
         }

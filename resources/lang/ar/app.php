@@ -225,5 +225,8 @@ return [
     'enter_your_email' => 'Enter your Email',
 	
     'user_blocked_login_details' => 'Your account has been blocked! Please contact Admin for further details.',
+    'select_area' => 'Select Area',
+    'country' => 'Country',
+    'select_country' => 'Select Country'
 ];
 // DI CODE - End

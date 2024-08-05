@@ -326,7 +326,7 @@ class HomeController extends Controller
 			->groupby('areas.id')
 			->get();*/
 		$locations = Area::select('areas.id', 'areas.name_en as location_en','areas.name_ar as location_ar','areas.slug', 'areas.image')
-			->where(['areas.area_id'=>'0', 'areas.status'=>'1'])
+			->where(['areas.area_id'=>'0', 'areas.status'=>'1','country_id'=>117])
 			->groupby('areas.id')
 			->get();
         if ($locations->count() > 0) {

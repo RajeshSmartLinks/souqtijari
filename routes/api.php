@@ -3,9 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\AdController;
+use App\Http\Controllers\Api\V1\HomeController;
+
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\NotificationController;
 
 Route::group(['prefix' => 'v1'], function () {
     Route::get('home/{device_token?}', [HomeController::class, 'index']);
@@ -47,16 +49,23 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('updateprofile', [UserController::class, 'update']);
         Route::post('ads', [UserController::class, 'myAds']);
         Route::get('favourites', [UserController::class, 'favorites']);
-        Route::post('favourites/add', 'Api\V1\UserController@addFavorite');
-        Route::get('orders', 'Api\V1\UserController@myOrders');
-        Route::get('order/{id}', 'Api\V1\UserController@orderDetail');
+        // Route::post('favourites/add', 'Api\V1\UserController@addFavorite');
+        // Route::get('orders', 'Api\V1\UserController@myOrders');
+        // Route::get('order/{id}', 'Api\V1\UserController@orderDetail');
+        Route::post('favourites/add', [UserController::class, 'addFavorite']);
+        Route::get('orders', [UserController::class, 'myOrders']);
+        Route::get('order/{id}', [UserController::class, 'orderDetail']);
 
     });
 
     Route::group(['prefix' => 'notification'], function () {
-        Route::get('/', [\App\Http\Controllers\Api\V1\NotificationController::class, 'index']);
-        Route::get('test/topic', 'Api\V1\NotificationController@sendTopic');
-        Route::get('test/order/{id?}', 'Api\V1\NotificationController@sendOrder');
+        // Route::get('/', [\App\Http\Controllers\Api\V1\NotificationController::class, 'index']);
+        // Route::get('test/topic', 'Api\V1\NotificationController@sendTopic');
+        // Route::get('test/order/{id?}', 'Api\V1\NotificationController@sendOrder');
+
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('test/topic', [NotificationController::class, 'sendTopic']);
+        Route::get('test/order/{id?}', [NotificationController::class, 'sendOrder']);
     });
 });
 
